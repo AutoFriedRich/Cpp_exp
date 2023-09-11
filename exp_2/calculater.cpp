@@ -30,7 +30,6 @@ char Node::getoprand()const{
         return data.opra;
     throw "wrong";
     }
-
 Node::Node(double number){type=nodeType::num;data.number=number;}
 Node::Node(char c){type=nodeType::opr;data.opra=c;}
 void Node::show(){
@@ -112,7 +111,7 @@ MyStack::~MyStack()
 
 class calculator:public MyStack{
     public:
-    //1,看下consr怎么调用函数，2，看下与父类不同怎么操作的
+    //1,看下const怎么调用函数，2，看下与父类不同怎么操作的
         void push(const Node& node)
         {
          switch (Node(node).getType())
@@ -165,7 +164,7 @@ int main(int argc, char const *argv[])
                 stack.push(std::stod(str)),str.clear();
             break;}
 
-        else if(c=='('||c=='*'||c=='/'){
+        else if(c=='('||c=='*'||c=='/'||c=='['||c=='{'){
             if(str.length()!=0)
             stack.push(std::stod(str)),str.clear();
                 oprandstack.push(c);
@@ -181,19 +180,25 @@ int main(int argc, char const *argv[])
             {   
                 stack.push(oprandstack.pop());
             }
-            
+
             oprandstack.push(c);
         }
-        else if (c==')')
+
+        else if (c==')'||c==']'||c=='}')
         {
             if(str.length()!=0) stack.push(std::stod(str)),str.clear();
             if (oprandstack.size()==0) problem("右括号多了");
-            while(oprandstack.TopNode().getoprand()!='(')
-            {stack.push(oprandstack.pop());
+            char left_oprand;
+            while(left_oprand=oprandstack.pop().getoprand(), left_oprand != '(' && left_oprand!='['&&left_oprand!='{')
+            {
+            stack.push(left_oprand);
             if (oprandstack.size()==0){problem("右括号多了");}
             }
-            oprandstack.pop();
+            //left_oprand = oprandstack.pop().getoprand();
+            if(!(c==')'&&left_oprand=='('  ||c==']'&&left_oprand=='['  ||c=='{'&&left_oprand=='}')){problem("符号不匹配");}
+            
         }
+
         else if((c>='0'&&c<='9')||(c=='.')) str.push_back(c);
         else problem("输错东西了");
                 
